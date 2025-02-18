@@ -17,3 +17,22 @@ To get started, first clone the repository to your local machine:
 
 ```bash
 git clone https://github.com/mrrdark022/askme
+
+## PIN Connection
+ **               +------------------+
+               |   INMP441 Mic    |
+               +------------------+
+               |  VCC   ------------+------------>  3.3V (ESP32)
+               |  GND   ------------+------------>  GND (ESP32)
+               |  SD    ------------+------------>  I2S_SD (GPIO 32)
+               |  SCK   ------------+------------>  I2S_SCK (GPIO 33)
+               |  WS    ------------+------------>  I2S_WS (GPIO 25)
+               +------------------+
+                        |
+                     +-----+
+                     | ESP |
+                     | 32  |
+                     +-----+
+                        |
+       Wi-Fi / UDP Connection (to server)
+**
