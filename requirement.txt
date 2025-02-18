@@ -1,0 +1,6 @@
+webrtcvad
+SpeechRecognition
+google-generativeai
+gTTS
+pyttsx3
+pydub
