@@ -20,6 +20,7 @@ git clone https://github.com/mrrdark022/askme
 ```
 ### PIN Connection
 ```bash
+  Download all the needed Drivers
 
                +------------------+
                |   INMP441 Mic    |
@@ -38,3 +39,11 @@ git clone https://github.com/mrrdark022/askme
                         |
        Wi-Fi / UDP Connection (to server)
 
+Make sure to copy your ESP32.ino code into your IDE, and if everything is good, flash it.
+```
+### SERVER Configuration
+```bash
+cd askme
+pip install -r requirement.txt (In newer systems you need to have a python env)
+python server.py
+```
