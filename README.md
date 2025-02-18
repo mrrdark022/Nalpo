@@ -17,9 +17,11 @@ To get started, first clone the repository to your local machine:
 
 ```bash
 git clone https://github.com/mrrdark022/askme
+```
+### PIN Connection
+```bash
 
-## PIN Connection
- **               +------------------+
+               +------------------+
                |   INMP441 Mic    |
                +------------------+
                |  VCC   ------------+------------>  3.3V (ESP32)
@@ -35,4 +37,4 @@ git clone https://github.com/mrrdark022/askme
                      +-----+
                         |
        Wi-Fi / UDP Connection (to server)
-**
+
