@@ -44,6 +44,6 @@ Make sure to copy your ESP32.ino code into your IDE, and if everything is good, 
 ### SERVER Configuration
 ```bash
 cd askme
-pip install -r requirement.txt (In newer systems you need to have a python env)
+pip install -r requirement.txt #(In newer systems you need to have a python env)
 python server.py
 ```
