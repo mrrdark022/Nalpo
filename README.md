@@ -47,4 +47,4 @@ cd askme
 pip install -r requirement.txt #(In newer systems you need to have a python env)
 python server.py
 ```
-### The full code was not written by me; most of it was done using ChatGPT. If you need a straightforward solution, you can use it.
+## The full code was not written by me; most of it was done using ChatGPT. If you need a straightforward solution, you can use it.
