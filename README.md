@@ -1,4 +1,5 @@
 # Nalpo - Voice Assistant Using ESP32 and Gemini AI
+![image](https://github.com/user-attachments/assets/494c142c-5887-4c1b-a6e1-76412731613c)
 
 ## Overview
 Nalpo is a voice assistant system that uses an **ESP32** and an **INMP441 microphone** to capture audio. The captured audio is sent to a server, where speech is detected and transcribed. The text is then processed by **Gemini AI** to generate a response, which is converted back into speech and played through a Bluetooth speaker connected to the server.
