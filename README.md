@@ -50,7 +50,7 @@ Ensure that your **ESP32** firmware is correctly flashed using the provided `.in
 ### Server Setup
 1. Navigate to the server directory:
 ```bash
-cd askme
+cd Nalpo
 ```
 2. Install required dependencies:
 ```bash
