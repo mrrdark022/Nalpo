@@ -1,5 +1,6 @@
 import socket
 import wave
+import webrtcvad
 import collections
 import time
 import speech_recognition as sr
@@ -8,6 +9,8 @@ from gtts import gTTS
 import os
 import re
 import threading
+from pydub import AudioSegment
+from pydub.playback import play
 
 SAMPLE_RATE = 16000
 SAMPLE_WIDTH = 2
@@ -21,11 +24,21 @@ SILENCE_HOLD_DURATION = 1.0
 vad = webrtcvad.Vad(VAD_AGGRESSIVENESS)
 
 # Configure Gemini API
-genai.configure(api_key="Your API key")
+genai.configure(api_key="AIzaSyARW65-WNqAB8fkjvjOy8IpX0jXTt1o35I")
 is_processing = threading.Lock()
+
+
+def send_udp_command(command):
+    UDP_IP = "192.168.104.7"
+    UDP_PORT = 12345
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.sendto(command.encode(), (UDP_IP, UDP_PORT))
+    sock.close()
+
 
 def is_speech(frame):
     return vad.is_speech(frame, SAMPLE_RATE)
+
 
 def save_audio(audio_data, filename='question.wav'):
     with wave.open(filename, 'wb') as wf:
@@ -33,8 +46,9 @@ def save_audio(audio_data, filename='question.wav'):
         wf.setsampwidth(SAMPLE_WIDTH)
         wf.setframerate(SAMPLE_RATE)
         wf.writeframes(audio_data)
-    print(f"[INFO] Saved audio to {filename}")
+        print(f"[INFO] Saved audio to {filename}")
     return filename
+
 
 def transcribe_audio(filename):
     recognizer = sr.Recognizer()
@@ -50,28 +64,66 @@ def transcribe_audio(filename):
         print(f"[ERROR] Could not request results: {e}")
     return None
 
+
 def speak_fast(text, lang='en-in', speed=1.4):
     tts = gTTS(text=text, lang=lang)
     tts.save("temp.mp3")
+    command = "processing"
+    send_udp_command(command)
     os.system(f"mpv --af=rubberband=pitch-scale=1.0 --no-video --speed={speed} temp.mp3")
+
 
 def clean_response(text):
     cleaned_text = re.sub(r'(\*\*|\*)', '', text)
     cleaned_text = re.sub(r'\s+', ' ', cleaned_text).strip()
     return cleaned_text
 
-def get_gemini_response(prompt):
+
+def get_gemini_response(user_input):
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")  # or "gemini-1.5-pro"
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        
+        prompt = f"""
+        You are my personal voice assistant, Nalpo. You are friendly, helpful, and a bit playful. 
+        You were created by Shahan, Khanjeet, and Uday—you know us well. 
+        Avoid calling me by any name; just keep it casual and natural.
+        Here’s what I said: "{user_input}"
+        Respond as Nalpo with a warm, cheerful, and engaging tone.
+        """
+
+        
         response = model.generate_content(
             prompt,
-            generation_config={"max_output_tokens": 70}  # Optional: Limit response length
+            generation_config={"max_output_tokens": 80}
         )
-        return clean_response(response.text)
+        return response.text.strip()
     except Exception as e:
         print(f"[ERROR] Gemini API request failed: {e}")
         return "I am sorry, I couldn't process that."
 
+
+def estimate_tts_duration(text, speed=1.4):
+    words = len(text.split())
+    words_per_second = (150 * speed) / 60
+    duration = words / words_per_second
+    return int(duration * 1000)
+
+def check_and_send_movement(transcription):
+    """
+    Checks if transcription contains 'mov {direction}' and sends UDP command if found.
+    """
+    directions = ["left", "right", "up", "down"]
+    words = transcription.lower().split()
+
+    for i in range(len(words) - 1):
+        if words[i] == "mov" or "move" and words[i + 1] in directions:
+            direction = words[i + 1]
+            command = f"mov {direction}"
+            print(f"Detected movement command: {command}")
+            send_udp_command(command)
+            return True
+
+    return False
 def process_audio_stream():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((UDP_IP, UDP_PORT))
@@ -89,6 +141,8 @@ def process_audio_stream():
         audio_buffer += data
 
         while len(audio_buffer) >= frame_size:
+           
+
             frame = audio_buffer[:frame_size]
             audio_buffer = audio_buffer[frame_size:]
 
@@ -99,6 +153,8 @@ def process_audio_stream():
                 last_voiced_time = time.time()
 
             if not is_recording and any(ring_buffer):
+                command = f"voicedetected {2000}"
+                send_udp_command(command)
                 print("[INFO] Voice detected. Starting recording...")
                 is_recording = True
                 speech_buffer = [frame]
@@ -113,14 +169,25 @@ def process_audio_stream():
                     filename = save_audio(audio_data)
                     speech_buffer.clear()
 
-                    # Transcribe and get Gemini response
                     transcription = transcribe_audio(filename)
                     if transcription:
-                        transcription = transcription + ", Explain in 1-3 sentences."
-                        with is_processing:
-                            response_text = get_gemini_response(transcription)
-                            print(f"[GEMINI RESPONSE] {response_text}")
-                            speak_fast(response_text, speed=1.4)
+                        if check_and_send_movement(transcription):
+                            # Movement detected and command sent, skip the rest
+                            print("Movement command detected. Skipping Gemini processing.")
+                        else:
+                            transcription += ", Explain in 1-3 sentences."
+                            
+                            with is_processing:
+                                response_text = get_gemini_response(transcription)
+
+                                print(f"[GEMINI RESPONSE] {response_text}")
+                                tts_duration = estimate_tts_duration(response_text, speed=1.4)
+
+                                command = f"processing {tts_duration}"
+                                send_udp_command(command)
+
+                                speak_fast(response_text, speed=1.4)
+
 
 if __name__ == '__main__':
     process_audio_stream()
