@@ -48,4 +48,4 @@ python server.py
 Make sure to copy your ESP32.ino code into your IDE, and if everything is good, flash it.
 ```
 
-## The full code was not written by me; most of it was done using ChatGPT. If you need a straightforward solution, you can use it.
+ The full code was not written by me; most of it was done using ChatGPT. If you need a straightforward solution, you can use it.
