@@ -1,7 +1,7 @@
-# AskMe - Voice Assistant Using ESP32 and Gemini AI
+# Nalpo - Voice Assistant Using ESP32 and Gemini AI
 
 ## Overview
-AskMe is a voice assistant system that uses an **ESP32** and an **INMP441 microphone** to capture audio. The captured audio is sent to a server, processed to detect speech, and then sent to **Gemini AI** for a response. The response is converted back into speech and played through a Bluetooth speaker connected to the server.
+Nalpo is a voice assistant system that uses an **ESP32** and an **INMP441 microphone** to capture audio. The captured audio is sent to a server, processed to detect speech, and then sent to **Gemini AI** for a response. The response is converted back into speech and played through a Bluetooth speaker connected to the server.
 
 ## Features
 - **ESP32** sends audio bytes to the server.
@@ -16,7 +16,7 @@ AskMe is a voice assistant system that uses an **ESP32** and an **INMP441 microp
 To get started, first clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/mrrdark022/askme
+git clone https://github.com/mrrdark022/Nalpo
 ```
 ### PIN Connection
 ```bash
