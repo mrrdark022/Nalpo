@@ -24,7 +24,7 @@ SILENCE_HOLD_DURATION = 1.0
 vad = webrtcvad.Vad(VAD_AGGRESSIVENESS)
 
 # Configure Gemini API
-genai.configure(api_key="AIzaSyARW65-WNqAB8fkjvjOy8IpX0jXTt1o35I")
+genai.configure(api_key="your API key")
 is_processing = threading.Lock()
 
 
